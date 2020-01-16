@@ -56,36 +56,39 @@ class ViewController: UIViewController, GCKSessionManagerListener, GCKRemoteMedi
 
   // MARK: Cast Actions
 
-  func playVideoRemotely() {
-    GCKCastContext.sharedInstance().presentDefaultExpandedMediaControls()
+    func playVideoRemotely() {
+      GCKCastContext.sharedInstance().presentDefaultExpandedMediaControls()
 
-    // Define media metadata.
-    let metadata = GCKMediaMetadata()
-    metadata.setString("Big Buck Bunny (2008)", forKey: kGCKMetadataKeyTitle)
-    metadata.setString("Big Buck Bunny tells the story of a giant rabbit with a heart bigger than " +
-      "himself. When one sunny day three rodents rudely harass him, something " +
-      "snaps... and the rabbit ain't no bunny anymore! In the typical cartoon " +
-      "tradition he prepares the nasty rodents a comical revenge.",
-                       forKey: kGCKMetadataKeySubtitle)
-    metadata.addImage(GCKImage(url: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg")!,
-                               width: 480,
-                               height: 360))
+      // Define media metadata.
+      let metadata = GCKMediaMetadata()
 
-    let mediaInfoBuilder = GCKMediaInformationBuilder(contentURL: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")!)
-    mediaInfoBuilder.streamType = GCKMediaStreamType.none
-    mediaInfoBuilder.contentType = "video/mp4"
-    mediaInfoBuilder.metadata = metadata
-    mediaInformation = mediaInfoBuilder.build()
+      let mediaInfoBuilder = GCKMediaInformationBuilder(contentURL: URL(string: "https://www.dropbox.com/s/bqhmu0vx6d2ol6w/video.mkv?dl=1")!)
+      mediaInfoBuilder.streamType = GCKMediaStreamType.none
+      mediaInfoBuilder.contentType = "video/mkv"
+      mediaInfoBuilder.metadata = metadata
+      
+      let track = GCKMediaTrack(identifier: 1, contentIdentifier: "https://www.dropbox.com/s/huhxqyp51g1jdmn/audio1.ac3?dl=1", contentType: "audio/ac3", type: .audio, textSubtype: .unknown, name: "Audio \(1)", languageCode: "ru", customData: nil)
+      let track2 = GCKMediaTrack(identifier: 2, contentIdentifier: "https://www.dropbox.com/s/c2hi8p44jt44pr1/audio2.ac3?dl=1", contentType: "audio/ac3", type: .audio, textSubtype: .unknown, name: "Audio \(2)", languageCode: "ru", customData: nil)
+      let track3 = GCKMediaTrack(identifier: 3, contentIdentifier: "https://www.dropbox.com/s/ogsh07dzfm1mlkm/audio3.ac3?dl=1", contentType: "audio/ac3", type: .audio, textSubtype: .unknown, name: "Audio \(3)", languageCode: "en", customData: nil)
+      let track4 = GCKMediaTrack(identifier: 4, contentIdentifier: "https://www.dropbox.com/s/esmh0mycqnpflv1/subtitles2.srt?dl=1", contentType: "text/vtt", type: .text, textSubtype: .captions, name: "Sub \(1)", languageCode: "en", customData: nil)
+      let track5 = GCKMediaTrack(identifier: 5, contentIdentifier: "https://www.dropbox.com/s/wzmselbwulbzdis/subtitles3.srt?dl=1", contentType: "text/vtt", type: .text, textSubtype: .captions, name: "Sub \(2)", languageCode: "ru", customData: nil)
+      mediaInfoBuilder.mediaTracks = [track, track2, track3, track4, track5]
+      mediaInformation = mediaInfoBuilder.build()
 
-    let mediaLoadRequestDataBuilder = GCKMediaLoadRequestDataBuilder()
-    mediaLoadRequestDataBuilder.mediaInformation = mediaInformation
+      let mediaLoadRequestDataBuilder = GCKMediaLoadRequestDataBuilder()
+      mediaLoadRequestDataBuilder.mediaInformation = mediaInformation
 
-    // Send a load request to the remote media client.
-    if let request = sessionManager.currentSession?.remoteMediaClient?.loadMedia(with: mediaLoadRequestDataBuilder.build()) {
-      request.delegate = self
+      // Send a load request to the remote media client.
+
+      mediaLoadRequestDataBuilder.autoplay = true
+      mediaLoadRequestDataBuilder.startTime = 0
+      mediaLoadRequestDataBuilder.activeTrackIDs = [NSNumber(value: 1), NSNumber(value: 4)]
+      
+      if let request = sessionManager.currentSession?.remoteMediaClient?.loadMedia(with: mediaLoadRequestDataBuilder.build()) {
+        request.delegate = self
+      }
     }
-  }
-
+  
   @IBAction func loadVideo(sender _: AnyObject) {
     print("Load Video")
 
